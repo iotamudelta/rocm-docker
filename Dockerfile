@@ -26,7 +26,7 @@ WORKDIR /root
 RUN git clone https://github.com/RadeonOpenCompute/ROCT-Thunk-Interface
 RUN mkdir -p /root/ROCT-Thunk-Interface/build
 WORKDIR ROCT-Thunk-Interface/build/
-RUN cmake -DCMAKE_INSTALL_PREFIX=/opt/rocm -DCMAKE_CXX_COMPILER=/opt/rocm/bin/amdclang++ -DCMAKE_CC_COMPILER=/opt/rocm/bin/amdclang -DCMAKE_BUILD_TYPE=RelWithDebInfo ..
+RUN cmake -DCMAKE_INSTALL_PREFIX=/opt/rocm -DCMAKE_CXX_COMPILER=/opt/rocm/bin/amdclang++ -DCMAKE_C_COMPILER=/opt/rocm/bin/amdclang -DCMAKE_BUILD_TYPE=RelWithDebInfo ..
 RUN make package
 RUN dpkg -i *.deb
 
@@ -34,15 +34,18 @@ WORKDIR /root
 RUN git clone https://github.com/RadeonOpenCompute/ROCm-Device-Libs.git -b amd-stg-open
 RUN mkdir -p /root/ROCm-Device-Libs/build
 WORKDIR ROCm-Device-Libs/build
-RUN cmake -DCMAKE_CXX_COMPILER=/opt/rocm/bin/amdclang++ -DCMAKE_CC_COMPILER=/opt/rocm/bin/amdclang -DCMAKE_INSTALL_PREFIX=/opt/rocm -DCMAKE_BUILD_TYPE=RelWithDebInfo ..
+RUN cmake -DCMAKE_CXX_COMPILER=/opt/rocm/bin/amdclang++ -DCMAKE_C_COMPILER=/opt/rocm/bin/amdclang -DROCM_DIR=/opt/rocm -DCMAKE_INSTALL_PREFIX=/opt/rocm -DCMAKE_BUILD_TYPE=RelWithDebInfo ..
 RUN make package
 RUN dpkg -i *.deb
+
+# link the bitcode into the right location
+RUN ln -s /usr/amdgcn /opt/rocm/amdgcn
 
 WORKDIR /root
 RUN git clone https://github.com/RadeonOpenCompute/ROCR-Runtime
 RUN mkdir -p /root/ROCR-Runtime/src/build
 WORKDIR ROCR-Runtime/src/build
-RUN cmake -DCMAKE_INSTALL_PREFIX=/opt/rocm -DBITCODE_DIR=/usr/amdgcn/bitcode -DCMAKE_CXX_COMPILER=/opt/rocm/bin/amdclang++ -DCMAKE_CC_COMPILER=/opt/rocm/bin/amdclang -DCMAKE_BUILD_TYPE=RelWithDebInfo ..
+RUN cmake -DCMAKE_INSTALL_PREFIX=/opt/rocm -DBITCODE_DIR=/usr/amdgcn/bitcode -DCMAKE_CXX_COMPILER=/opt/rocm/bin/amdclang++ -DCMAKE_C_COMPILER=/opt/rocm/bin/amdclang -DCMAKE_BUILD_TYPE=RelWithDebInfo ..
 RUN make package
 RUN dpkg -i *.deb
 
@@ -83,7 +86,7 @@ WORKDIR hipamd/build
 # fix invalid cpack generator string
 # RUN sed -i s/TGZ\:DEB/TGZ\;DEB/g ../packaging/CMakeLists.txt
 
-RUN cmake -DCMAKE_CXX_COMPILER=/opt/rocm/bin/amdclang++ -DCMAKE_CC_COMPILER=/opt/rocm/bin/amdclang -DHIP_COMMON_DIR=/root/hip -DAMD_OPENCL_PATH=/root/ROCm-OpenCL-Runtime -DROCCLR_PATH=/root/ROCclr -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_PREFIX_PATH=/opt/rocm/llvm/lib/cmake -DCMAKE_INSTALL_PREFIX=/opt/rocm ..
+RUN cmake -DCMAKE_CXX_COMPILER=/opt/rocm/bin/amdclang++ -DCMAKE_C_COMPILER=/opt/rocm/bin/amdclang -DHIP_COMMON_DIR=/root/hip -DAMD_OPENCL_PATH=/root/ROCm-OpenCL-Runtime -DROCCLR_PATH=/root/ROCclr -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_PREFIX_PATH=/opt/rocm/llvm/lib/cmake -DCMAKE_INSTALL_PREFIX=/opt/rocm ..
 RUN make -j8
 RUN make package
 RUN rm hip-runtime-nvidia*
