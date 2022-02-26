@@ -1,4 +1,4 @@
-FROM ubuntu:18.04
+FROM ubuntu:20.04
 
 LABEL org.opencontainers.image.authors="johannes.dieterich@amd.com"
 
@@ -11,9 +11,11 @@ RUN apt install -y rpm wget sudo
 RUN wget https://github.com/Kitware/CMake/releases/download/v3.22.2/cmake-3.22.2-Linux-x86_64.sh
 RUN yes | sh cmake-3.22.2-Linux-x86_64.sh
 
-RUN apt install -y git gcc build-essential bison vim libnuma-dev numactl libtbb-dev libelf-dev pkg-config libdrm-amdgpu1 libdrm2 pciutils libdrm-dev libudev-dev llvm-10-dev clang-10 libclang-10-dev xxd lld-10 clang-tools-10 liburi-encode-perl libfile-basedir-perl libfile-copy-recursive-perl libfile-listing-perl libfile-which-perl libglx-mesa0 libglx0 mesa-common-dev sudo wget gnupg2 git gcc libboost-dev bzip2 openmpi-bin flex libboost-all-dev vim libsqlite3-dev python3-setuptools numactl sqlite3
+RUN apt install -y git gcc build-essential bison vim libnuma-dev numactl libtbb-dev libelf-dev pkg-config libdrm-amdgpu1 libdrm2 pciutils libdrm-dev libudev-dev llvm-12-dev clang-12 libclang-12-dev xxd lld-12 clang-tools-12 liburi-encode-perl libfile-basedir-perl libfile-copy-recursive-perl libfile-listing-perl libfile-which-perl libglx-mesa0 libglx0 mesa-common-dev sudo wget gnupg2 git gcc libboost-dev bzip2 openmpi-bin flex libboost-all-dev vim libsqlite3-dev python3-setuptools numactl sqlite3
 
 ENV CMAKE_PREFIX_PATH="/opt/rocm-5.0.0:${CMAKE_PREFIX_PATH}"
+
+RUN apt install -y libncurses5-dev libncursesw5-dev libtinfo5
 
 RUN wget -q -O - https://repo.radeon.com/rocm/rocm.gpg.key | sudo apt-key add -
 RUN echo 'deb [arch=amd64] https://repo.radeon.com/rocm/apt/debian/ ubuntu main' | sudo tee /etc/apt/sources.list.d/rocm.list
